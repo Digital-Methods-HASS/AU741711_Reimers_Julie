@@ -1,0 +1,100 @@
+---
+title: "Assignment_Week14"
+output: html_document
+date: "2024-04-03"
+---
+# Task 1: Create a Danish equivalent of AUSmap with esri layers, 
+# but call it DANmap
+
+########## ADD DATA TO LEAFLET
+
+# In this section you will manually create machine-readable spatial
+# data from GoogleMaps: 
+
+### First, go to https://bit.ly/CreateCoordinates1
+### Enter the coordinates of your favorite leisure places in Denmark 
+# extracting them from the URL in googlemaps, adding name and type of monument.
+# Remember to copy the coordinates as a string, as just two decimal numbers separated by comma. 
+
+# Caveats: Do NOT edit the grey columns! They populate automatically!
+
+### Second, read the sheet into R. You will need gmail login information. 
+# watch the console, it may ask you to authenticate or put in the number 
+# that corresponds to the account you wish to use.
+
+# Libraries
+
+```{r}
+library(tidyverse)
+library(googlesheets4)
+library(leaflet)
+```
+
+
+# Read in a Google sheet
+```{r}
+places <- read_sheet("https://docs.google.com/spreadsheets/d/1PlxsPElZML8LZKyXbqdAYeQCDIvDps2McZx1cTVWSzI/edit#gid=124710918",
+                     col_types = "cccnncnc",
+                     range="DM2023")
+glimpse(places)
+
+```
+
+
+# load the coordinates in the map and check: are any points missing? Why?
+```{r}
+DANmap <- leaflet() %>% 
+  addTiles() %>% 
+  addProviderTiles("Stadia.StamenWatercolor") %>% 
+  addMarkers(lng = places$Longitude, 
+             lat = places$Latitude,
+             popup = places$Description)
+DANmap
+```
+
+
+#########################################################
+
+
+# Task 2: Read in the googlesheet data you and your colleagues 
+# populated with data into the DANmap object you created in Task 1.
+```{r}
+DANmap
+```
+
+
+# Task 3: Can you cluster the points in Leaflet? Google "clustering options in Leaflet"
+```{r}
+DANmap_clusters <- leaflet() %>% 
+  addTiles() %>% 
+  addProviderTiles("Stadia.StamenWatercolor") %>% 
+  addMarkers(lng = places$Longitude, 
+             lat = places$Latitude,
+             popup = places$Description,
+             clusterOptions = markerClusterOptions())
+DANmap_clusters
+```
+
+
+# Task 4: Look at the map and consider what it is good for and what not.
+```{r}
+# It is good for showing how we as a class in Aarhus think there are many good places. But it is difficult without zooming in to se where exactly the thinks are located. 
+
+```
+
+
+# Task 5: Find out how to display notes and classifications in the map.
+```{r}
+DANmap_notes <- leaflet() %>% 
+  addTiles() %>% 
+  addProviderTiles("Stadia.StamenWatercolor") %>% 
+  addMarkers(lng = places$Longitude, 
+             lat = places$Latitude,
+             popup=paste(
+               "By:", places$Placename, "<br>",
+               "Type:", places$Type, "<br>",
+               "Description:", places$Description),
+             clusterOptions = markerClusterOptions())
+DANmap_notes
+```
+
